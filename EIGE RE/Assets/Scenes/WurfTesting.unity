@@ -146,7 +146,7 @@ PrefabInstance:
     - target: {fileID: 802526109804386620, guid: 910c037bfd23f534cbfbed07968615f0,
         type: 3}
       propertyPath: m_Center.y
-      value: 2.7
+      value: 3.5
       objectReference: {fileID: 0}
     - target: {fileID: 2938273612633301428, guid: 910c037bfd23f534cbfbed07968615f0,
         type: 3}
@@ -392,6 +392,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abf53e5954429e542a4d406248de7260, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spieler: {fileID: 0}
   jarid: {fileID: 1126499003}
   speer: {fileID: 1143403665}
   throwForce: 50
