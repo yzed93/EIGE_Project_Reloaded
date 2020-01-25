@@ -7,7 +7,7 @@ public class SpearThrow : MonoBehaviour
     public Jarid_BasicMovement jarid;
     public Rigidbody speer;
     [SerializeField]
-    [Range(10, 50)]
+    [Range(10, 100)]
     public float throwForce;
     
 
