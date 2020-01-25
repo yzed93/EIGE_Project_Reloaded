@@ -4,14 +4,21 @@ using UnityEngine;
 
 public class SpearThrow : MonoBehaviour
 {
-   
+    public Jarid_BasicMovement jarid;
     public Rigidbody speer;
     [SerializeField]
     [Range(10, 50)]
     public float throwForce;
     
 
-     void Awake()
+     void Update()
+    {
+        if (jarid.getActionState()==ActionState.AIMING && Input.GetButtonDown("Fire1"))
+        {
+            Throw();
+        }
+    }
+    void Throw()
     {
         speer.transform.parent = null;
         speer.isKinematic = false;
