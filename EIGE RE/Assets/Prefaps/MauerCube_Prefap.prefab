@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8931955269975863400}
   m_Layer: 0
   m_Name: MauerCube_Prefap
-  m_TagString: Untagged
+  m_TagString: Hindernis
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
