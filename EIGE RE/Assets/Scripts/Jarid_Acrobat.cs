@@ -6,55 +6,46 @@ public class Jarid_Acrobat
 {
     public float chillWinkel = 3;
     public float initialRotateSpeed = 3;
-    public float acceleration = 0.1f;
-    public float deceleration = 0.3f;
-    public float overallSlowness = 15;
+    public float acceleration = 25f;
+    public float deceleration = 3f;
+    public float overallSlowness = 5;
     public float absprungPower = 3;
 
     private float maxWinkel;
     private float nullWinkel;
     private float hangWinkel;
+    private float hangWinkelAlt;
     private bool runterwärts;
     private float rotateAmount;
 
     private Jarid_BasicMovement basicMovement;
     private Rigidbody playerRigidbody;
     private GameObject playerGameObject;
+    private Collider other;
 
     private Transform reckstange;
     private Transform Achse;
+    private Transform targetTransformation;
 
     public void hangOntoReck(Collider other)
     {
+        this.other = other;
         reckstange = other.transform.GetChild(0);
         Achse = other.transform;
         hangWinkel = 0;
         
-
-
-        
-        
         reckstange.LookAt(playerGameObject.transform.position);
-        Debug.Log("x1=" + reckstange.rotation.x + " x2=" + Achse.rotation.x + " y1=" + reckstange.rotation.x + " y2=" + Achse.rotation.x + " z1=" + reckstange.rotation.z + " z2=" + Achse.rotation.z);
+        //Debug.Log("x1=" + reckstange.rotation.x + " x2=" + Achse.rotation.x + " y1=" + reckstange.rotation.x + " y2=" + Achse.rotation.x + " z1=" + reckstange.rotation.z + " z2=" + Achse.rotation.z);
         float winkel = Vector3.Angle(Achse.forward, reckstange.forward);
         //Debug.Log("Winkel: " + winkel);
         playerGameObject.transform.LookAt(new Vector3(reckstange.position.x, reckstange.position.y, reckstange.position.z));
-        //reckstange.RotateAround(reckstange.position, Vector3.up, winkel);
-        //playerGameObject.transform.RotateAround(playerGameObject.transform.position, reckstange.up, winkel > 90? -winkel : winkel);
-
-        //transform.rotation = Quaternion.LookRotation(reckstange.rotation.eulerAngles);
-        //Quaternion.LookRotation(reckstange.right, reckstange.forward);
-        //                transform.RotateAround(transform.position, reckstange.up, 90);
-        //playerGameObject.transform.RotateAround(playerGameObject.transform.position, reckstange.up, (ankathete > 0 ? winkelOfDoom : -winkelOfDoom));
-        //transform.RotateAround(transform.position, reckstange.up, (ankathete > 0 ? 90 : -90));
-
-        /*
-        reckstange.Rotate(0, 0, winkelOfDoom + (ankathete > 0 ? 0 : -90));
+        playerGameObject.transform.RotateAround(playerGameObject.transform.position, playerGameObject.transform.right, 90);
         playerGameObject.transform.SetParent(reckstange);
-
-        maxWinkel = winkelOfDoom < 3 ? 3 : (winkelOfDoom + (ankathete > 0 ? 0 : 90));
-        nullWinkel = -winkelOfDoom;
-        runterwärts = true;*/
+        
+        playerRigidbody.transform.RotateAround(playerRigidbody.transform.position, playerRigidbody.transform.up, -90);
+        targetTransformation = Achse;
+        //targetTransformation.position -= new Vector3(0, 0.4f, 0);
+        
     }
     public Jarid_Acrobat(Jarid_BasicMovement basicMovement)
     {
@@ -65,12 +56,20 @@ public class Jarid_Acrobat
         
     }
 
+    public void gettingToPosition()
+    {
+        reckstange.transform.rotation = Quaternion.Lerp(reckstange.rotation, targetTransformation.rotation, Time.deltaTime*5);
+        if (Quaternion.Angle(reckstange.rotation, targetTransformation.rotation) < 0.5)
+        {
+            basicMovement.changeActionState(ActionState.SWINGING);
+        }
+
+    }
+
     public void ForwardSwinging(float forwardInput)
-    { /*
+    { 
         rotateAmount = 0;
 
-        float hangWinkelAlt = hangWinkel;
-        hangWinkel = reckstange.rotation.eulerAngles.z - 180;
         if (hangWinkelAlt * hangWinkel < 0)
         {
             runterwärts = !runterwärts;
@@ -110,9 +109,12 @@ public class Jarid_Acrobat
         }
 
         //            Debug.Log(rotateAmount);
-        //Debug.Log((runterwärts? "Runter" : "Hinauf") + ",\thangWinkel=" + hangWinkel + ",\tmaxWinkel=" + maxWinkel + ",\tnullWinkel=" + nullWinkel + ",\tamount=" + rotateAmount);
-        reckstange.Rotate(new Vector3(0, rotateAmount, 0));
-        */
+        Debug.Log((runterwärts? "Runter" : "Hinauf") + ",\thangWinkel=" + hangWinkel + ",\tmaxWinkel=" + maxWinkel + ",\tnullWinkel=" + nullWinkel + ",\tamount=" + rotateAmount);
+        hangWinkelAlt = hangWinkel;
+        hangWinkel += rotateAmount;
+
+        reckstange.RotateAround(Achse.position, Achse.up, rotateAmount);
+        
     }
 
 
@@ -124,6 +126,7 @@ public class Jarid_Acrobat
         playerRigidbody.isKinematic = false;
         playerRigidbody.useGravity = true;
         reckstange.transform.rotation = Quaternion.Euler(180, 0, 0);
+        other.attachedRigidbody.detectCollisions = false;
 
         Vector3 absprungRichtung = playerRigidbody.transform.forward;
         Debug.Log(rotateAmount);

@@ -3,6 +3,7 @@
 [RequireComponent (typeof (Rigidbody))]
 public class Jarid_BasicMovement : MonoBehaviour
 {
+    private Collider altereckstange;
     private ActionState doing;
     public MoveSettings moveSettings;
     public InputSettings inputSettings;
@@ -100,6 +101,10 @@ public class Jarid_BasicMovement : MonoBehaviour
             case (ActionState.SWINGING):
                 acrobaticSkills.ForwardSwinging(forwardInput);
                 break;
+            case (ActionState.GETTINGTHEHANGOFIT):
+                acrobaticSkills.gettingToPosition();
+                break;
+        
         }
     }
 
@@ -112,7 +117,7 @@ public class Jarid_BasicMovement : MonoBehaviour
                     playerRigidbody.velocity = new Vector3(playerRigidbody.velocity.x, moveSettings.jumpVelocity, playerRigidbody.velocity.z);
                 }
             } else if (doing == ActionState.SWINGING) {
-                acrobaticSkills.JumpSwinging();
+                this.doing = acrobaticSkills.JumpSwinging();
             }
         }
     }
@@ -152,16 +157,23 @@ public class Jarid_BasicMovement : MonoBehaviour
     //private Quaternion reckstangeUrsprung;
     
     bool Grounded() {
-        return Physics.Raycast(transform.position, Vector3.down, moveSettings.distanceToGround, moveSettings.ground);
+        if (Physics.Raycast(transform.position, Vector3.down, moveSettings.distanceToGround, moveSettings.ground))
+        {
+            if (altereckstange != null) altereckstange.attachedRigidbody.detectCollisions = true;
+
+            return true;
+        }
+        return false;
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.tag.Equals("Reckstange")) {
-            doing = ActionState.SWINGING;
+            doing = ActionState.GETTINGTHEHANGOFIT;
             playerRigidbody.useGravity = false;
             playerRigidbody.isKinematic = true;
             acrobaticSkills.hangOntoReck(other);
+            altereckstange = other;
         }
     }
 
