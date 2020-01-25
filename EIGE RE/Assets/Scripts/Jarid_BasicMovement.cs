@@ -4,7 +4,8 @@
 public class Jarid_BasicMovement : MonoBehaviour
 {
     private ActionState doing;
-
+    public MoveSettings moveSettings;
+    public InputSettings inputSettings;
     public ActionState getActionState() {
         return doing;
     }
@@ -30,18 +31,18 @@ public class Jarid_BasicMovement : MonoBehaviour
     /*     +++++++     */
     /* +++++++++++++++ */
 
-    public MoveSettings moveSettings;
-    public InputSettings inputSettings;
     private float forwardInput, sidewaysInput, turnInput, lookupInput, jumpInput;
     private bool mouseOnePressed, mouseTwoPressed, mouseTwoHeld, mouseTwoReleased;
 
     void GetInput() {
         if (inputSettings.FORWARD_AXIS.Length != 0) {
             forwardInput = Input.GetAxis(inputSettings.FORWARD_AXIS);
+            Debug.Log("ForwardInput detected: " + forwardInput);
         }
 
         if (inputSettings.SIDEWAYS_AXIS.Length != 0) {
             sidewaysInput = Input.GetAxis(inputSettings.SIDEWAYS_AXIS);
+            //Debug.Log("sidewaysInput detected: " + sidewaysInput);
         }
 
         if (inputSettings.JUMP_AXIS.Length != 0)
@@ -68,17 +69,22 @@ public class Jarid_BasicMovement : MonoBehaviour
     private Quaternion targetRotation;
     private bool moving;
 
+    public void changeActionState(ActionState newActionState)
+    {
+        this.doing = newActionState;
+    }
+
     public bool isMoving() {
         return moving;
     }
     
     void Forward() {
        if (Grounded()) {
-            Debug.Log("geht");
+            Debug.Log("geht: " + forwardInput + " " + sidewaysInput);
             velocity.z = forwardInput * moveSettings.runSpeed * ((doing == ActionState.AIMING)? 0.5f : 1f);
             velocity.x = sidewaysInput * moveSettings.runSpeed * ((doing == ActionState.AIMING) ? 0.5f : 1f);
             velocity.y = playerRigidbody.velocity.y;
-
+            //Debug.Log("x" + velocity.x + " y" + velocity.y + " z" + velocity.z);
             playerRigidbody.velocity = transform.TransformDirection(velocity);
         }
     }
