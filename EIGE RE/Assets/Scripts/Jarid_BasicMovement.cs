@@ -169,7 +169,7 @@ public class MoveSettings {
     public float runSpeed = 5;
     public float rotateVelocity = 150;
     public float lookupVelocity = 150;
-    public float jumpVelocity = 8;
+    public float jumpVelocity = 12;
     public float distanceToGround = 1.3f;
     public LayerMask ground;
 }
