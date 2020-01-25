@@ -74,6 +74,7 @@ public class Jarid_BasicMovement : MonoBehaviour
     
     void Forward() {
        if (Grounded()) {
+            Debug.Log("geht");
             velocity.z = forwardInput * moveSettings.runSpeed * ((doing == ActionState.AIMING)? 0.5f : 1f);
             velocity.x = sidewaysInput * moveSettings.runSpeed * ((doing == ActionState.AIMING) ? 0.5f : 1f);
             velocity.y = playerRigidbody.velocity.y;
