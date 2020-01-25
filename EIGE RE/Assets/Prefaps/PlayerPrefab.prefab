@@ -42,6 +42,8 @@ GameObject:
   - component: {fileID: 2156833170738764057}
   - component: {fileID: 2156833170738764036}
   - component: {fileID: 2156833170738764037}
+  - component: {fileID: 3091308862453344267}
+  - component: {fileID: 1801651478943446661}
   m_Layer: 0
   m_Name: PlayerPrefab
   m_TagString: Untagged
@@ -124,6 +126,34 @@ MonoBehaviour:
     JUMP_AXIS: Jump
   viewDirection: {fileID: 2156833170738764038}
   viewVertical: {fileID: 2156833169135400142}
+--- !u!114 &3091308862453344267
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2156833170738764058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c4295202016aa9419104129896cc77b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spieler: {fileID: 2156833170738764037}
+--- !u!114 &1801651478943446661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2156833170738764058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abf53e5954429e542a4d406248de7260, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jarid: {fileID: 2156833170738764037}
+  speer: {fileID: -8108839413987590797, guid: 910c037bfd23f534cbfbed07968615f0, type: 3}
+  throwForce: 0
 --- !u!1001 &2156833171017721196
 PrefabInstance:
   m_ObjectHideFlags: 0

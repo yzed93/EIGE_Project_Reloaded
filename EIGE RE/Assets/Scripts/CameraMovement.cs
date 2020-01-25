@@ -36,7 +36,7 @@ public class CameraMovement : MonoBehaviour
         aimingOverPlayer = 0.3f;
         aimingOverRightShoulder = 0.8f;
         turningAmount = 30;
-
+        
     }
 
     public void transition()

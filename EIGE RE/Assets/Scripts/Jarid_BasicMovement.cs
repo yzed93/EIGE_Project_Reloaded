@@ -23,6 +23,7 @@ public class Jarid_BasicMovement : MonoBehaviour
         targetRotation = transform.rotation;
         moving = false;
         doing = ActionState.RUNNING;
+        acrobaticSkills = new Jarid_Acrobat(this);
     }
 
     /* +++++++++++++++ */
@@ -37,7 +38,7 @@ public class Jarid_BasicMovement : MonoBehaviour
     void GetInput() {
         if (inputSettings.FORWARD_AXIS.Length != 0) {
             forwardInput = Input.GetAxis(inputSettings.FORWARD_AXIS);
-            Debug.Log("ForwardInput detected: " + forwardInput);
+            //Debug.Log("ForwardInput detected: " + forwardInput);
         }
 
         if (inputSettings.SIDEWAYS_AXIS.Length != 0) {
@@ -69,6 +70,10 @@ public class Jarid_BasicMovement : MonoBehaviour
     private Quaternion targetRotation;
     private bool moving;
 
+
+    private Jarid_Acrobat acrobaticSkills;
+
+
     public void changeActionState(ActionState newActionState)
     {
         this.doing = newActionState;
@@ -79,13 +84,22 @@ public class Jarid_BasicMovement : MonoBehaviour
     }
     
     void Forward() {
-       if (Grounded()) {
-            Debug.Log("geht: " + forwardInput + " " + sidewaysInput);
-            velocity.z = forwardInput * moveSettings.runSpeed * ((doing == ActionState.AIMING)? 0.5f : 1f);
-            velocity.x = sidewaysInput * moveSettings.runSpeed * ((doing == ActionState.AIMING) ? 0.5f : 1f);
-            velocity.y = playerRigidbody.velocity.y;
-            //Debug.Log("x" + velocity.x + " y" + velocity.y + " z" + velocity.z);
-            playerRigidbody.velocity = transform.TransformDirection(velocity);
+        switch (doing)
+        {
+            case (ActionState.RUNNING):
+                if (Grounded())
+                {
+                    //Debug.Log("geht: " + forwardInput + " " + sidewaysInput);
+                    velocity.z = forwardInput * moveSettings.runSpeed * ((doing == ActionState.AIMING) ? 0.5f : 1f);
+                    velocity.x = sidewaysInput * moveSettings.runSpeed * ((doing == ActionState.AIMING) ? 0.5f : 1f);
+                    velocity.y = playerRigidbody.velocity.y;
+                    //Debug.Log("x" + velocity.x + " y" + velocity.y + " z" + velocity.z);
+                    playerRigidbody.velocity = transform.TransformDirection(velocity);
+                }
+                break;
+            case (ActionState.SWINGING):
+                acrobaticSkills.ForwardSwinging(forwardInput);
+                break;
         }
     }
 
@@ -98,7 +112,7 @@ public class Jarid_BasicMovement : MonoBehaviour
                     playerRigidbody.velocity = new Vector3(playerRigidbody.velocity.x, moveSettings.jumpVelocity, playerRigidbody.velocity.z);
                 }
             } else if (doing == ActionState.SWINGING) {
-                // TODO
+                acrobaticSkills.JumpSwinging();
             }
         }
     }
@@ -136,11 +150,21 @@ public class Jarid_BasicMovement : MonoBehaviour
     /*              +++++++++++++++++++++++++              */
     /* +++++++++++++++++++++++++++++++++++++++++++++++++++ */
     //private Quaternion reckstangeUrsprung;
-
+    
     bool Grounded() {
         return Physics.Raycast(transform.position, Vector3.down, moveSettings.distanceToGround, moveSettings.ground);
     }
-    
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag.Equals("Reckstange")) {
+            doing = ActionState.SWINGING;
+            playerRigidbody.useGravity = false;
+            playerRigidbody.isKinematic = true;
+            acrobaticSkills.hangOntoReck(other);
+        }
+    }
+
     /* +++++++++++++++++++ */
     /*      +++++++++      */
     /*       UPDATES       */
@@ -156,19 +180,6 @@ public class Jarid_BasicMovement : MonoBehaviour
         Forward();
         Jump();
     }
-}
-
-
-[System.Serializable]
-public class AcrobaticSettings
-{
-    public float chillWinkel = 3;
-    public float initialRotateSpeed = 3;
-    public float acceleration = 0.1f;
-    public float deceleration = 0.3f;
-    public float overallSlowness = 15;
-    public float absprungPower = 3;
-
 }
 
 [System.Serializable]
@@ -193,5 +204,5 @@ public class InputSettings {
 
 public enum ActionState
 {
-    RUNNING, SWINGING, AIMING
+    RUNNING, SWINGING, AIMING, GETTINGTHEHANGOFIT
 }
