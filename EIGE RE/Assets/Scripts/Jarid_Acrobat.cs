@@ -6,13 +6,12 @@ public class Jarid_Acrobat
 {
     public float chillWinkel = 3;
     public float initialRotateSpeed = 3;
-    public float acceleration = 25f;
-    public float deceleration = 3f;
+    public float acceleration = 20f;
+    public float deceleration = 25f;
     public float overallSlowness = 5;
-    public float absprungPower = 3;
+    public float absprungPower = 2.5f;
 
     private float maxWinkel;
-    private float nullWinkel;
     private float hangWinkel;
     private float hangWinkelAlt;
     private bool runterwärts;
@@ -59,6 +58,7 @@ public class Jarid_Acrobat
     public void gettingToPosition()
     {
         reckstange.transform.rotation = Quaternion.Lerp(reckstange.rotation, targetTransformation.rotation, Time.deltaTime*5);
+        
         if (Quaternion.Angle(reckstange.rotation, targetTransformation.rotation) < 0.5)
         {
             basicMovement.changeActionState(ActionState.SWINGING);
@@ -69,7 +69,10 @@ public class Jarid_Acrobat
     public void ForwardSwinging(float forwardInput)
     { 
         rotateAmount = 0;
-
+        if (maxWinkel == chillWinkel && forwardInput != 0)
+        {
+            maxWinkel += acceleration / 4;
+        }
         if (hangWinkelAlt * hangWinkel < 0)
         {
             runterwärts = !runterwärts;
@@ -77,44 +80,36 @@ public class Jarid_Acrobat
             {
                 if (maxWinkel >= chillWinkel + deceleration)
                 {
-                    maxWinkel -= (deceleration + maxWinkel) / 8f;
+                    maxWinkel -= deceleration;
                 }
                 else
                 {
                     maxWinkel = chillWinkel;
                 }
-            }
-        }
-        else if (Mathf.Abs(Mathf.Abs(hangWinkel) - Mathf.Abs(maxWinkel)) < 2 || Mathf.Abs(hangWinkel) - Mathf.Abs(maxWinkel) > 0)
-        {
-            runterwärts = true;
-            if (forwardInput != 0)
+            } else {
                 maxWinkel += acceleration * (maxWinkel > 0 ? 1 : -1);
-
-            if (maxWinkel > 130) maxWinkel = 130;
+                if (maxWinkel > 100) maxWinkel = 100;
+            }
+        } else if (Mathf.Abs(Mathf.Abs(hangWinkel) - Mathf.Abs(maxWinkel)) < 2 || Mathf.Abs(hangWinkel) - Mathf.Abs(maxWinkel) > 0) {
+            runterwärts = true;
             if (maxWinkel < chillWinkel) maxWinkel = chillWinkel;
         }
 
-
-        if (runterwärts)
-        {
-
+        if (maxWinkel == chillWinkel) {
+            rotateAmount = 0;
+        } else if (runterwärts) {
             rotateAmount = ((Mathf.Abs(maxWinkel) - Mathf.Abs(hangWinkel)) / overallSlowness) * (hangWinkel > 0 ? -1 : 1);
             if (rotateAmount == 0) rotateAmount = (hangWinkel > 0 ? -0.1f : 0.1f);
-        }
-        else
-        {
+        } else {
             rotateAmount = ((Mathf.Abs(hangWinkel) - Mathf.Abs(maxWinkel)) / overallSlowness) * (hangWinkel > 0 ? -1 : 1);
             if (rotateAmount == 0) rotateAmount = (hangWinkel > 0 ? 0.1f : -0.1f);
         }
 
-        //            Debug.Log(rotateAmount);
-        Debug.Log((runterwärts? "Runter" : "Hinauf") + ",\thangWinkel=" + hangWinkel + ",\tmaxWinkel=" + maxWinkel + ",\tnullWinkel=" + nullWinkel + ",\tamount=" + rotateAmount);
+        //Debug.Log((runterwärts? "Runter" : "Hinauf") + ",\thangWinkel=" + hangWinkel + ",\tmaxWinkel=" + maxWinkel + ",\tamount=" + rotateAmount);
         hangWinkelAlt = hangWinkel;
         hangWinkel += rotateAmount;
 
         reckstange.RotateAround(Achse.position, Achse.up, rotateAmount);
-        
     }
 
 
@@ -125,12 +120,13 @@ public class Jarid_Acrobat
 
         playerRigidbody.isKinematic = false;
         playerRigidbody.useGravity = true;
-        reckstange.transform.rotation = Quaternion.Euler(180, 0, 0);
-        other.attachedRigidbody.detectCollisions = false;
-
-        Vector3 absprungRichtung = playerRigidbody.transform.forward;
-        Debug.Log(rotateAmount);
-        playerRigidbody.velocity = absprungRichtung * rotateAmount * -absprungPower;
+        //reckstange.transform.rotation = Quaternion.Euler(180, 0, 0);
+            
+        Vector3 absprungRichtung = playerGameObject.transform.forward;
+        Debug.Log(rotateAmount * absprungPower);
+        playerRigidbody.velocity = absprungRichtung * rotateAmount * absprungPower;
+        rotateAmount = 0;
+        maxWinkel = chillWinkel;
         return ActionState.RUNNING;
     }
 }

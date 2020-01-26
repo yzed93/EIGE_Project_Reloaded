@@ -1,9 +1,9 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 [RequireComponent (typeof (Rigidbody))]
 public class Jarid_BasicMovement : MonoBehaviour
 {
-    private Collider altereckstange;
     private ActionState doing;
     public MoveSettings moveSettings;
     public InputSettings inputSettings;
@@ -25,6 +25,7 @@ public class Jarid_BasicMovement : MonoBehaviour
         moving = false;
         doing = ActionState.RUNNING;
         acrobaticSkills = new Jarid_Acrobat(this);
+        
     }
 
     /* +++++++++++++++ */
@@ -34,7 +35,6 @@ public class Jarid_BasicMovement : MonoBehaviour
     /* +++++++++++++++ */
 
     private float forwardInput, sidewaysInput, turnInput, lookupInput, jumpInput;
-    private bool mouseOnePressed, mouseTwoPressed, mouseTwoHeld, mouseTwoReleased;
 
     void GetInput() {
         if (inputSettings.FORWARD_AXIS.Length != 0) {
@@ -54,10 +54,6 @@ public class Jarid_BasicMovement : MonoBehaviour
         if (inputSettings.TURN_AXIS.Length != 0)
             turnInput = Input.GetAxis(inputSettings.TURN_AXIS);
 
-        mouseOnePressed = Input.GetMouseButtonDown(0);
-        mouseTwoHeld = Input.GetMouseButton(1);
-        mouseTwoPressed = Input.GetMouseButtonDown(1);
-        mouseTwoReleased = Input.GetMouseButtonUp(1);
     }
 
     /* ++++++++++++++++++++ */
@@ -118,8 +114,24 @@ public class Jarid_BasicMovement : MonoBehaviour
                 }
             } else if (doing == ActionState.SWINGING) {
                 this.doing = acrobaticSkills.JumpSwinging();
+                reckstangenCollider.enabled = false;
+                StartCoroutine(EnableCollision(3, reckstangenCollider));
             }
         }
+    }
+
+    public void Spawn()
+    {
+        //TODO
+    }
+
+    public ParticleSystem Bloodspurt;
+    public void Death()
+    {
+        Debug.Log("Dead");
+        Instantiate(Bloodspurt, transform);
+        playerRigidbody.isKinematic = true;
+        doing = ActionState.DEAD;
     }
 
 
@@ -155,26 +167,33 @@ public class Jarid_BasicMovement : MonoBehaviour
     /*              +++++++++++++++++++++++++              */
     /* +++++++++++++++++++++++++++++++++++++++++++++++++++ */
     //private Quaternion reckstangeUrsprung;
-    
-    bool Grounded() {
-        if (Physics.Raycast(transform.position, Vector3.down, moveSettings.distanceToGround, moveSettings.ground))
-        {
-            if (altereckstange != null) altereckstange.attachedRigidbody.detectCollisions = true;
 
-            return true;
-        }
-        return false;
+   
+    bool Grounded() {
+        return Physics.Raycast(transform.position, Vector3.down, moveSettings.distanceToGround, moveSettings.ground);
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.tag.Equals("Reckstange")) {
+            this.reckstangenCollider = other;
             doing = ActionState.GETTINGTHEHANGOFIT;
             playerRigidbody.useGravity = false;
             playerRigidbody.isKinematic = true;
             acrobaticSkills.hangOntoReck(other);
-            altereckstange = other;
+                
+            Debug.Log("False. (Enter)");
+        } else if (other.tag.Equals("YouDieHere")) {
+            Death();
         }
+    }
+
+    private Collider reckstangenCollider;
+
+    private IEnumerator EnableCollision(float delay, Collider other)
+    {
+        yield return new WaitForSeconds(delay);
+        other.enabled = true;
     }
 
     /* +++++++++++++++++++ */
@@ -216,5 +235,5 @@ public class InputSettings {
 
 public enum ActionState
 {
-    RUNNING, SWINGING, AIMING, GETTINGTHEHANGOFIT
+    RUNNING, SWINGING, AIMING, GETTINGTHEHANGOFIT, DEAD
 }

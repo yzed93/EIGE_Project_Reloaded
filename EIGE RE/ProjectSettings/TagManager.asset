@@ -8,6 +8,7 @@ TagManager:
   - Hindernis
   - Speer
   - Reckstange
+  - YouDieHere
   layers:
   - Default
   - TransparentFX
