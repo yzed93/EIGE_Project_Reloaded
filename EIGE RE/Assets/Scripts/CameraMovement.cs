@@ -37,20 +37,21 @@ public class CameraMovement : MonoBehaviour
         aimingOverPlayer = 0.3f;
         aimingOverRightShoulder = 0.8f;
         turningAmount = 30;
-        oldActionState = jarid.getActionState();
+        //oldActionState = jarid.getActionState();
     }
 
     public void transition()
     {
-        this.smooth = 100;
+        //this.smooth = 100;
+        // This needs a fix
     }
 
     public void transitionOver()
     {
-        this.smooth = 0;
+        //this.smooth = 0;
     }
 
-    private ActionState oldActionState;
+    //private ActionState oldActionState;
 
     void LateUpdate()
     {   
@@ -79,7 +80,7 @@ public class CameraMovement : MonoBehaviour
             transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * smooth);
             transform.LookAt(followedObject, Vector3.up * 30);
         }
-        oldActionState = jarid.getActionState();
-        if (transform.position.y < followedObject.position.y) transform.position = new Vector3(transform.position.x, followedObject.position.y, transform.position.z);
+        //oldActionState = jarid.getActionState();
+        //if (transform.position.y < followedObject.position.y) transform.position = new Vector3(transform.position.x, followedObject.position.y, transform.position.z);
     }
 }
